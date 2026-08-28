@@ -1,0 +1,27 @@
+name: Assemble v3 site
+
+on:
+  push:
+    paths:
+      - 'deploy-v3/chunk_10.b64'
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rebuild standalone app
+        run: |
+          cat deploy-v3/chunk_*.b64 | base64 -d > index.html
+          rm -rf deploy-v3
+          rm -f .github/workflows/assemble-v3.yml
+      - name: Commit rebuilt app
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html deploy-v3 .github/workflows/assemble-v3.yml
+          git commit -m "Deploy v3 icon dropdown interface"
+          git push
